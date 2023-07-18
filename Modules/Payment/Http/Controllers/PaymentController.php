@@ -29,6 +29,17 @@ class PaymentController extends Controller
         ]);
     }
 
+    public function report2(): Renderable
+    {
+        return view('payment::payment.report2', [
+            'title' => 'Laporan Pembayaran',
+            'bills' => Bill::query()->select(['id', 'name'])->get(),
+            'years' => SchoolYear::query()->select(['id', 'year'])->get(),
+            'students' => Student::query()->get(),
+            // 'students' => Student::query()->active()->select(['id', 'name', 'nis', 'nisn'])->get(),
+        ]);
+    }
+
     public function printYearly(Request $request)
     {
         $user = $request->query('user');

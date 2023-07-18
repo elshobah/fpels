@@ -14,6 +14,13 @@ Route::middleware(['auth', 'verified', Installed::class])->group(function () {
         Route::get('print-not-monthly/{params?}', [PaymentController::class, 'printNotMonthly'])->name('print-not-monthly');
     });
 
+    Route::middleware('can:manage_payment')->prefix('report2')->as('report2.')->group(function () {
+        Route::get('/', [PaymentController::class, 'report2'])->name('report2');
+        Route::get('print-yearly/{params?}', [PaymentController::class, 'printYearly'])->name('print-yearly');
+        Route::get('print-monthly/{params?}', [PaymentController::class, 'printMonthly'])->name('print-monthly');
+        Route::get('print-not-monthly/{params?}', [PaymentController::class, 'printNotMonthly'])->name('print-not-monthly');
+    });
+
     Route::middleware('can:manage_spending')->prefix('spending')->as('spending.')->group(function () {
         Route::get('/', [SpendingController::class, 'index'])->name('index');
     });

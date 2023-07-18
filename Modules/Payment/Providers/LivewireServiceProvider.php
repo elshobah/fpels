@@ -14,6 +14,7 @@ class LivewireServiceProvider extends ServiceProvider
     public function register()
     {
         \Livewire\Livewire::component('payment', \Modules\Payment\Http\Livewire\StudentPayment::class);
+        \Livewire\Livewire::component('report2', \Modules\Payment\Http\Livewire\PaymentReport::class);
         \Livewire\Livewire::component('spending-datatable', \Modules\Payment\Datatables\SpendingDatatable::class);
         \Livewire\Livewire::component('note-datatable', \Modules\Payment\Datatables\NoteDatatable::class);
     }
