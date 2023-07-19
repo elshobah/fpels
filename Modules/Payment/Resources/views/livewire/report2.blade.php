@@ -9,7 +9,7 @@
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group custom-select-icon" wire:ignore>
-                                            <select class="custom-select" id="search-student" wire:model='student'>
+                                            <select class="custom-select" id="search-student" wire:model='student.value'>
                                                 <option></option>
                                                 @foreach ($students as $item)
                                                     <option value="{{ $item->id }}">
@@ -75,10 +75,10 @@
                     @if ($billResult && $billResult->monthly)
                         <div class="card card-primary">
                             <div class="card-header">
-                                <h4>Detail Pembayaran</h4>
+                                <h4>Detail Laporan Pembayaran</h4>
                             </div>
 
-                            <x-payments.table-monthly
+                            <x-payments.table-all-payment
                                 :year="$year"
                                 :bill="$bill"
                                 :semester="$odd"
@@ -89,7 +89,7 @@
                                 type="ganjil"
                             />
 
-                            <x-payments.table-monthly
+                            <x-payments.table-all-payment
                                 :year="$year"
                                 :bill="$bill"
                                 :semester="$even"

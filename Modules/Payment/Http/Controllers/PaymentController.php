@@ -35,8 +35,8 @@ class PaymentController extends Controller
             'title' => 'Laporan Pembayaran',
             'bills' => Bill::query()->select(['id', 'name'])->get(),
             'years' => SchoolYear::query()->select(['id', 'year'])->get(),
-            'students' => Student::query()->get(),
-            // 'students' => Student::query()->active()->select(['id', 'name', 'nis', 'nisn'])->get(),
+            // 'students' => Student::query()->get(),
+            'students' => Student::query()->active()->select(['id', 'name', 'nis', 'nisn'])->get(),
         ]);
     }
 
