@@ -16,7 +16,7 @@
                 <th>Tagihan</th>
                 <th>Nominal</th>
                 <th>Status</th>
-                <th>Aksi</th>
+                {{-- <th>Aksi</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -97,7 +97,7 @@
                             @if (array_sum($totalForStatus) === $billResult['nominal'])
                                 <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
                             @else
-                                <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
+                                <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak {{$billResult['nominal'], array_sum($totalForStatus)}}</span>
                             @endif
                         </td>
                         {{-- <td>
