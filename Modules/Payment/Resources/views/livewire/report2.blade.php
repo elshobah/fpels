@@ -9,7 +9,7 @@
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group custom-select-icon" wire:ignore>
-                                            <select class="custom-select" id="search-student" wire:model='student.value'>
+                                            <select class="custom-select" id="search-student" wire:model='student' wire:change='search'>
                                                 <option></option>
                                                 @foreach ($students as $item)
                                                     <option value="{{ $item->id }}">
@@ -49,7 +49,7 @@
                                     </div>
                                     <div class="col col-lg-2">
                                         <div class="form-group custom-select-icon" wire:ignore>
-                                            <select class="custom-select" id="search-month" wire:model='month'>
+                                            <select class="custom-select" id="search-month" wire:model='month' wire:change='search'>
                                                 <option></option>
                                                 @foreach ($months as $key => $item)
                                                     <option value="{{ '0'.$key+1 }}">
@@ -96,7 +96,7 @@
                                     :bill="$bill"
                                     :semester="$odd"
                                     :month="$month"
-                                    :students="$students"
+                                    :students="count($dataStudent)>0 ? $dataStudent : $students"
                                     :payments="$payments"
                                     title="Semester Ganjil"
                                     :bill-result="$billResult"
@@ -108,7 +108,7 @@
                                     :bill="$bill"
                                     :semester="$even"
                                     :month="$month"
-                                    :students="$students"
+                                    :students="count($dataStudent)>0 ? $dataStudent : $students"
                                     :payments="$payments"
                                     title="Semester Genap"
                                     :bill-result="$billResult"

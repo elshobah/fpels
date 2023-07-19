@@ -22,14 +22,20 @@
         <tbody>
             @foreach ($semester as $i => $e)
                 @php
-                    $any = isset($payments[$i]);
+                    // if (!is_null($month)&&$i==$month) {
+                    //     $any = isset($payments[$month]);
+                    // } elseif (is_null($month)) {
+                        $any = isset($payments[$i]);
+                    // }
                     $totalForStatus = [];
+                    // dd($payments[$i]);
                     if ($any) {
                         foreach ($payments[$i] as $key => $value) {
                             $totalForStatus[] = $value['pay'];
                         }
                     }
                 @endphp
+                {{-- {{ dd($payments) }} --}}
 
             @if (!is_null($month)&&$i==$month)
                 @foreach ($students as $student)
@@ -43,11 +49,21 @@
                         <td>{{ $billResult->name }}</td>
                         <td>{{ idr($billResult->nominal) }}</td>
                         <td>
-                            @if (array_sum($totalForStatus) === $billResult['nominal'])
-                                <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
+                            @if ($value['student_id'] == $student->id)
+                                @if (array_sum($totalForStatus) === $billResult['nominal'])
+                                    <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
+                                @else
+                                    <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
+                                @endif
                             @else
                                 <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
                             @endif
+
+                            {{-- @if (array_sum($totalForStatus) === $billResult['nominal'])
+                                <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
+                            @else
+                                <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
+                            @endif --}}
                         </td>
                         {{-- <td>
                             <button class="btn btn-info btn-sm" role="button" data-toggle="collapse"
@@ -66,7 +82,7 @@
                         </td> --}}
                     </tr>
                 @endforeach
-                @elseif (is_null($month))
+            @elseif (is_null($month))
                 @foreach ($students as $student)
                     <tr>
                         <td>

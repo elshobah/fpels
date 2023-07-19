@@ -62,6 +62,7 @@ class StudentPayment extends Component
             $rawQuery .= ', `users`.`name` as author_name';
             $rawQuery .= ', `payments`.`id`, `payments`.`change`, `payments`.`pay`, `payments`.`pay_date`, `payments`.`code`';
 
+            // dd($this->billResult, $this->student);
             $payments = DB::table('payments')
                 ->select(DB::raw($rawQuery))
                 ->where('payments.year_id', $this->year)

@@ -27,6 +27,7 @@ class PaymentReport extends Component
     /** @var string */
     public $bill = null;
     public $year = null;
+    public $dataStudent = [];
     public $student = null;
     public $billResult = null;
 
@@ -56,28 +57,46 @@ class PaymentReport extends Component
         $this->change = null;
     }
 
+    public function resetFilters()
+    {
+        // $this->reset('search');
+        // Will only reset the search property.
+    
+        $this->reset(['student']);
+        // Will reset both the search AND the isActive property.
+    
+        // $this->resetExcept('search');
+        // Will only reset the isActive property (any property but the search property).
+    }
+
     public function search()
     {
-        $this->billResult = Bill::query()->where('id', $this->bill)->first();
-        $this->student = Student::find($this->student);
         // dd($this->billResult, $this->student);
-
+        $this->billResult = Bill::query()->where('id', $this->bill)->first();
+        
+        if (!is_null($this->student)) {
+            $this->dataStudent = [Student::find($this->student)];
+            // dd($this->dataStudent);
+            $studentQuery = '= "'.$this->dataStudent[0]->id.'"';
+        } else {
+            $studentQuery = 'is not null';
+        }
+        !is_null($this->month) ? $monthQuery = '= '.$this->month : $monthQuery = 'is not null';
         if ($this->billResult->monthly) {
-            // dd($this->student);
             $rawQuery = 'MONTH(`payments`.`month`) as month';
             $rawQuery .= ', `users`.`name` as author_name';
-            $rawQuery .= ', `payments`.`id`, `payments`.`change`, `payments`.`pay`, `payments`.`pay_date`, `payments`.`code`';
+            $rawQuery .= ', `payments`.`id`, `payments`.`student_id`, `payments`.`change`, `payments`.`pay`, `payments`.`pay_date`, `payments`.`code`';
 
-            !is_null($this->student) ? $studentQuery = $this->student->id : $studentQuery = '!=, null';
+            // dd($this->student);
 
-            $date = create_date($this->month);
-            // dd($date);
+            // $date = create_date($this->month);
+            // dd($monthQuery);
             $payments = DB::table('payments')
                 ->select(DB::raw($rawQuery))
                 ->where('payments.year_id', $this->year)
-                ->whereMonth('payments.month', $this->month)
+                ->whereRaw('MONTH(`payments`.`month`) '.$monthQuery)
+                ->whereRaw('`payments`.`student_id` '.$studentQuery)
                 ->where('payments.bill_id', $this->bill)
-                ->where('payments.student_id', '!=', 'null')
                 ->leftJoin('users', 'payments.created_by', '=', 'users.id')
                 ->groupBy('payments.id')
                 ->orderBy('payments.month', 'asc')
@@ -96,7 +115,7 @@ class PaymentReport extends Component
             $this->payments = Payment::query()
                 ->where('year_id', $this->year)
                 ->where('bill_id', $this->bill)
-                ->where('student_id', $this->student->id)
+                ->where('student_id', $studentQuery)
                 ->with('student')
                 ->get();
         }
