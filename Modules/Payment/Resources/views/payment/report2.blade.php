@@ -12,6 +12,7 @@
     <livewire:report2
         :bills="$bills"
         :years="$years"
+        :months="$months"
         :students="$students"
     />
 </x-app-layout>

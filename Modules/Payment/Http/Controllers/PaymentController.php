@@ -2,6 +2,7 @@
 
 namespace Modules\Payment\Http\Controllers;
 
+use Modules\Utils\Month;
 use Illuminate\Http\Request;
 use Modules\Master\Entities\Bill;
 use Illuminate\Routing\Controller;
@@ -31,13 +32,17 @@ class PaymentController extends Controller
 
     public function report2(): Renderable
     {
-        return view('payment::payment.report2', [
+        $data = [
             'title' => 'Laporan Pembayaran',
             'bills' => Bill::query()->select(['id', 'name'])->get(),
             'years' => SchoolYear::query()->select(['id', 'year'])->get(),
+            'months' => Month::prefixName(),
             // 'students' => Student::query()->get(),
             'students' => Student::query()->active()->select(['id', 'name', 'nis', 'nisn'])->get(),
-        ]);
+        ];
+        // dd($data['months']);
+
+        return view('payment::payment.report2', $data);
     }
 
     public function printYearly(Request $request)
