@@ -149,7 +149,7 @@ class SpendingDatatable extends TableComponent
             // Column::make('nama', 'name')
             //     ->searchable()
             //     ->sortable(),
-            Column::make('Outcome', 'note_id')
+            Column::make('Pengeluaran', 'note_id')
                 ->searchable()
                 ->sortable()
                 ->format(function (Spending $model) {
