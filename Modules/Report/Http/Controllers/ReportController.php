@@ -20,10 +20,12 @@ class ReportController extends Controller
         BillRepository $bill,
         IncomeRepository $income,
         StudentRepository $student,
+        SpendingRepository $spending,
     ) {
         $this->bill = $bill;
         $this->income = $income;
         $this->student = $student;
+        $this->spending = $spending;
     }
 
     /**
@@ -47,6 +49,7 @@ class ReportController extends Controller
                 'weekly' => $this->income->weeklyPercentage(),
                 'monthly' => $this->income->monthlyPercentage(),
                 'yearly' => $this->income->yearlyPercentage(),
+            // 'saldo' => $this->income->income() - $this->spending->spending(),
             ],
         ]);
     }
