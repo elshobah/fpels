@@ -32,7 +32,7 @@ class SpendingController extends Controller
 
         // untuk add new data menggunakan script ini
         if (!empty($bills)) {
-            $billId = $bills[1]['id']; // Get the first bill's ID or choose the desired bill ID
+            $billId = $bills[0]['id']; // Get the first bill's ID or choose the desired bill ID
 
             $notes = $note->getByBillId($billId)->toArray();
         }
