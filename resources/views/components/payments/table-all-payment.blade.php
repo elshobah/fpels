@@ -28,9 +28,12 @@
                         $any = isset($payments[$i]);
                     // }
                     $totalForStatus = [];
+                    $studentId = '';
                     // dd($payments[$i]);
                     if ($any) {
                         foreach ($payments[$i] as $key => $value) {
+                            $studentId = $value['student_id'];
+                            // ($value['student_id'] == $student->id) ? $status = true : $status = false;
                             $totalForStatus[] = $value['pay'];
                         }
                     }
@@ -49,7 +52,7 @@
                         <td>{{ $billResult->name }}</td>
                         <td>{{ idr($billResult->nominal) }}</td>
                         <td>
-                            @if ($value['student_id'] == $student->id)
+                            @if ($studentId == $student->id)
                                 @if (array_sum($totalForStatus) === $billResult['nominal'])
                                     <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
                                 @else
@@ -94,10 +97,14 @@
                         <td>{{ $billResult->name }}</td>
                         <td>{{ idr($billResult->nominal) }}</td>
                         <td>
-                            @if (array_sum($totalForStatus) === $billResult['nominal'])
-                                <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
+                            @if ($studentId == $student->id)
+                                @if (array_sum($totalForStatus) === $billResult['nominal'])
+                                    <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
+                                @else
+                                    <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
+                                @endif
                             @else
-                                <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak {{$billResult['nominal'], array_sum($totalForStatus)}}</span>
+                                <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
                             @endif
                         </td>
                         {{-- <td>
