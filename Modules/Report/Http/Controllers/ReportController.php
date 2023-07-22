@@ -8,6 +8,8 @@ use Modules\Master\Repository\BillRepository;
 use Modules\Master\Repository\StudentRepository;
 use Modules\Report\Repository\IncomeRepository;
 use Modules\Payment\Repository\SpendingRepository;
+use Modules\Payment\Repository\PaymentRepository;
+use Modules\Payment\Repository\NoteRepository;
 
 class ReportController extends Controller
 {
@@ -15,17 +17,23 @@ class ReportController extends Controller
     protected IncomeRepository $income;
     protected StudentRepository $student;
     protected SpendingRepository $spending;
+    protected PaymentRepository $payment;
+    protected NoteRepository $note;
 
     public function __construct(
         BillRepository $bill,
         IncomeRepository $income,
         StudentRepository $student,
         SpendingRepository $spending,
+        PaymentRepository $payment,
+        NoteRepository $note
     ) {
         $this->bill = $bill;
         $this->income = $income;
         $this->student = $student;
         $this->spending = $spending;
+        $this->payment = $payment;
+        $this->note = $note;
     }
 
     /**
@@ -43,9 +51,12 @@ class ReportController extends Controller
     {
         return view('report::finance.index', [
             'title' => 'Laporan Keuangan',
-            'bills' => $this->bill->all()->orderBy('payments_sum_pay', 'desc')->get(),
+            'bills2' => $this->bill->all()->orderBy('payments_sum_pay', 'desc')->get(),
             'income' => $this->income->getIncome(),
             'spending' => $this->spending->getSpending(),
+            'bills' => $this->bill->getBill()->toArray(),
+            'payment' => $this->payment->all(),
+            'notes' => $this->note->getNote()->toArray(),
             'stats' => [
                 'daily' => $this->income->dailyPercentage(),
                 'weekly' => $this->income->weeklyPercentage(),

@@ -25,6 +25,11 @@ class NoteEloquent implements NoteRepository
         return $this->note->all();
     }
 
+    public function getNote()
+    {
+        return $this->note->query()->get();
+    }
+
        /**
      * Get bill where id
      *
