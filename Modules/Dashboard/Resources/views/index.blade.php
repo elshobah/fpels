@@ -63,6 +63,15 @@
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-6">
+                <livewire:notif-spp-datatable />
+            </div>
+            <div class="col-6">
+                <livewire:notif-du-datatable />
+            </div>
+        </div>
+
     </section>
 
     {{-- <div class="container-fluid"> --}}
