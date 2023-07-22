@@ -25,6 +25,11 @@ class BillEloquent implements BillRepository
         return $this->bill->withSum('payments', 'pay')->withSum('spendings', 'nominal');
     }
 
+    public function getBill()
+    {
+        return $this->bill->query()->get();
+    }
+
     /**
      * Get bill where id
      *

@@ -2,10 +2,10 @@
     <div class="d-flex">
         <h6 class="mb-0 mt-2">{{ $title }}</h6>
         <div class="ml-auto">
-            <a href="{{ route('payment.print-yearly', ['user' => $student, 'bill' => $bill, 'year' => $year, 'type' => $type]) }}"
+            {{-- <a href="{{ route('payment.print-yearly', ['user' => $student, 'bill' => $bill, 'year' => $year, 'type' => $type]) }}"
                 target="_blank" class="btn btn-dark">
                 <i class="fa fa-print"></i>
-            </a>
+            </a> --}}
         </div>
     </div>
     <table class="table table-bordered mt-3">
@@ -16,53 +16,127 @@
                 <th>Tagihan</th>
                 <th>Nominal</th>
                 <th>Status</th>
-                <th>Aksi</th>
+                {{-- <th>Aksi</th> --}}
             </tr>
         </thead>
         <tbody>
             @foreach ($semester as $i => $e)
                 @php
-                    $any = isset($payments[$i]);
+                    // if (!is_null($month)&&$i==$month) {
+                    //     $any = isset($payments[$month]);
+                    // } elseif (is_null($month)) {
+                        $any = isset($payments[$i]);
+                    // }
                     $totalForStatus = [];
+                    $studentId = '';
+                    $payed = 0;
+                    // dd($payments[$i]);
                     if ($any) {
                         foreach ($payments[$i] as $key => $value) {
-                            $totalForStatus[] = $value['pay'];
+                            $studentId = $value['student_id'];
+                            // ($value['student_id'] == $student->id) ? $status = true : $status = false;
+                            $status['value'] = $value['pay'];
+                            $status['student_id'] = $value['student_id'];
+                            array_push($totalForStatus, $status);
+                            // $totalForStatus[] = $status;
                         }
                     }
                 @endphp
+                {{-- {{ dd($payments) }} --}}
 
-                <tr>
-                    <td>
-                        <strong>{{ $student }}</strong>
-                    </td>
-                    <td>
-                        <strong>{{ $e }}</strong>
-                    </td>
-                    <td>{{ $billResult->name }}</td>
-                    <td>{{ idr($billResult->nominal) }}</td>
-                    <td>
-                        @if (array_sum($totalForStatus) === $billResult['nominal'])
-                            <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
-                        @else
-                            <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
-                        @endif
-                    </td>
-                    <td>
-                        <button class="btn btn-info btn-sm" role="button" data-toggle="collapse"
-                            data-target="#table-detail-{{ $i }}">
-                            <i class="fad fa-eye"></i>
-                        </button>
-                        <a href="{{ route('payment.print-monthly', ['user' => $student, 'bill' => $bill, 'month' => $i, 'year' => $year, 'type' => $type]) }}" target="_blank"
-                            class="btn btn-dark btn-sm {{ !$any && empty($payments[$i]) ? 'disabled' : '' }}"
-                            {{ !$any && empty($payments[$i]) ? 'disabled' : '' }}>
-                            <i class="fad fa-print"></i>
-                        </a>
-                        <button wire:click.prevent='pay("{{ $i }}")' class="btn btn-sm btn-success"
-                            {{ array_sum($totalForStatus) === $billResult['nominal'] ? 'disabled' : '' }}>
-                            <i class="fad fa-money-bill-alt"></i>
-                        </button>
-                    </td>
-                </tr>
+            @if (!is_null($month)&&$i==$month)
+                @foreach ($students as $student)
+                    <tr>
+                        <td>
+                            <strong>{{ $student->name }}</strong>
+                        </td>
+                        <td>
+                            <strong>{{ $e }}</strong>
+                        </td>
+                        <td>{{ $billResult->name }}</td>
+                        <td>{{ idr($billResult->nominal) }}</td>
+                        <td>
+                            @php
+                                // get only student id from array
+                                $studentId = array_column($totalForStatus, 'student_id');
+                            @endphp
+                            @if (!in_array($student->id, $studentId))
+                                <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
+                            @else
+                                @foreach ($totalForStatus as $status)
+                                    {{-- @dd($totalForStatus) --}}
+                                    @if (($status['value'] == $billResult['nominal'])&&($status['student_id'] == $student->id))
+                                        <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
+                                    @else
+                                        @continue
+                                    @endif
+                                @endforeach
+                            @endif
+                        </td>
+                        {{-- <td>
+                            <button class="btn btn-info btn-sm" role="button" data-toggle="collapse"
+                                data-target="#table-detail-{{ $i }}">
+                                <i class="fad fa-eye"></i>
+                            </button>
+                            <a href="{{ route('payment.print-monthly', ['user' => $student->id, 'bill' => $bill, 'month' => $i, 'year' => $year, 'type' => $type]) }}" target="_blank"
+                                class="btn btn-dark btn-sm {{ !$any && empty($payments[$i]) ? 'disabled' : '' }}"
+                                {{ !$any && empty($payments[$i]) ? 'disabled' : '' }}>
+                                <i class="fad fa-print"></i>
+                            </a>
+                            <button wire:click.prevent='pay("{{ $i }}", "{{ $student->id }}")' class="btn btn-sm btn-success"
+                                {{ array_sum($totalForStatus) === $billResult['nominal'] ? 'disabled' : '' }}>
+                                <i class="fad fa-money-bill-alt"></i>
+                            </button>
+                        </td> --}}
+                    </tr>
+                @endforeach
+            @elseif (is_null($month))
+                @foreach ($students as $student)
+                    <tr>
+                        <td>
+                            <strong>{{ $student->name }}</strong>
+                        </td>
+                        <td>
+                            <strong>{{ $e }}</strong>
+                        </td>
+                        <td>{{ $billResult->name }}</td>
+                        <td>{{ idr($billResult->nominal) }}</td>
+                        <td>
+                            @php
+                                // get only student id from array
+                                $studentId = array_column($totalForStatus, 'student_id');
+                            @endphp
+                            @if (!in_array($student->id, $studentId))
+                                <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
+                            @else
+                                @foreach ($totalForStatus as $status)
+                                    {{-- @dd($totalForStatus) --}}
+                                    @if (($status['value'] == $billResult['nominal'])&&($status['student_id'] == $student->id))
+                                        <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
+                                    @else
+                                        @continue
+                                    @endif
+                                @endforeach
+                            @endif
+                        </td>
+                        {{-- <td>
+                            <button class="btn btn-info btn-sm" role="button" data-toggle="collapse"
+                                data-target="#table-detail-{{ $i }}">
+                                <i class="fad fa-eye"></i>
+                            </button>
+                            <a href="{{ route('payment.print-monthly', ['user' => $student->id, 'bill' => $bill, 'month' => $i, 'year' => $year, 'type' => $type]) }}" target="_blank"
+                                class="btn btn-dark btn-sm {{ !$any && empty($payments[$i]) ? 'disabled' : '' }}"
+                                {{ !$any && empty($payments[$i]) ? 'disabled' : '' }}>
+                                <i class="fad fa-print"></i>
+                            </a>
+                            <button wire:click.prevent='pay("{{ $i }}", "{{ $student->id }}")' class="btn btn-sm btn-success"
+                                {{ array_sum($totalForStatus) === $billResult['nominal'] ? 'disabled' : '' }}>
+                                <i class="fad fa-money-bill-alt"></i>
+                            </button>
+                        </td> --}}
+                    </tr>
+                    @endforeach
+                @endif
                 @if ($any)
                     <tr>
                         <td colspan="12" class="hiddenRow">

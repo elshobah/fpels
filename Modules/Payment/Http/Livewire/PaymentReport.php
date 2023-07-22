@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Master\Entities\Bill;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Modules\Master\Entities\Student;
 use Modules\Payment\Entities\Payment;
 use Modules\Payment\Http\Requests\PaymentRequest;
 
@@ -20,11 +21,13 @@ class PaymentReport extends Component
     /** @var object get data object from controller */
     public $bills;
     public $years;
+    public $months;
     public $students;
 
     /** @var string */
     public $bill = null;
     public $year = null;
+    public $dataStudent = [];
     public $student = null;
     public $billResult = null;
 
@@ -35,6 +38,7 @@ class PaymentReport extends Component
 
     /** @var null|string|integer */
     public $pay;
+    public $studentPay;
     public $month;
     public $change;
     public $pay_date;
@@ -53,20 +57,46 @@ class PaymentReport extends Component
         $this->change = null;
     }
 
+    public function resetFilters()
+    {
+        // $this->reset('search');
+        // Will only reset the search property.
+    
+        $this->reset(['student']);
+        // Will reset both the search AND the isActive property.
+    
+        // $this->resetExcept('search');
+        // Will only reset the isActive property (any property but the search property).
+    }
+
     public function search()
     {
+        // dd($this->billResult, $this->student);
         $this->billResult = Bill::query()->where('id', $this->bill)->first();
-
+        
+        if (!is_null($this->student)) {
+            $this->dataStudent = [Student::find($this->student)];
+            // dd($this->dataStudent);
+            $studentQuery = '= "'.$this->dataStudent[0]->id.'"';
+        } else {
+            $studentQuery = 'is not null';
+        }
+        !is_null($this->month) ? $monthQuery = '= '.$this->month : $monthQuery = 'is not null';
         if ($this->billResult->monthly) {
             $rawQuery = 'MONTH(`payments`.`month`) as month';
             $rawQuery .= ', `users`.`name` as author_name';
-            $rawQuery .= ', `payments`.`id`, `payments`.`change`, `payments`.`pay`, `payments`.`pay_date`, `payments`.`code`';
+            $rawQuery .= ', `payments`.`id`, `payments`.`student_id`, `payments`.`change`, `payments`.`pay`, `payments`.`pay_date`, `payments`.`code`';
 
+            // dd($this->student);
+
+            // $date = create_date($this->month);
+            // dd($monthQuery);
             $payments = DB::table('payments')
                 ->select(DB::raw($rawQuery))
                 ->where('payments.year_id', $this->year)
+                ->whereRaw('MONTH(`payments`.`month`) '.$monthQuery)
+                ->whereRaw('`payments`.`student_id` '.$studentQuery)
                 ->where('payments.bill_id', $this->bill)
-                ->where('payments.student_id', $this->student)
                 ->leftJoin('users', 'payments.created_by', '=', 'users.id')
                 ->groupBy('payments.id')
                 ->orderBy('payments.month', 'asc')
@@ -78,21 +108,24 @@ class PaymentReport extends Component
             foreach ($payments as $p) {
                 $results[$p->month][] = (array)$p;
             }
+            // dd($results);
 
             $this->payments = $results;
         } else {
             $this->payments = Payment::query()
                 ->where('year_id', $this->year)
                 ->where('bill_id', $this->bill)
-                ->where('student_id', $this->student)
+                ->where('student_id', $studentQuery)
                 ->with('student')
                 ->get();
         }
     }
 
-    public function pay($month = null)
+    public function pay($month = null, $student)
     {
         $this->resetValue();
+        // dd($month, $student);
+        $this->studentPay = $student;
 
         if (!is_null($month)) {
             $this->totalPayment = [];
@@ -138,7 +171,10 @@ class PaymentReport extends Component
 
     public function onPay()
     {
-        $request = new PaymentRequest($this->bill, $this->year, $this->student, $this->month);
+        // dd($this->bill, $this->year, $this->studentPay, $this->month);
+        // get month from date
+        $month = date('m', strtotime($this->month));
+        $request = new PaymentRequest($this->bill, $this->year, $this->studentPay, $this->month);
         $validated = $this->validate($request->rules(), [], $request->attributes());
 
         DB::beginTransaction();
@@ -155,7 +191,7 @@ class PaymentReport extends Component
                 'bill_id' => $this->bill,
                 'year_id' => $this->year,
                 'change' => $this->change,
-                'student_id' => $this->student,
+                'student_id' => $this->studentPay,
                 'code' => Trx::generate(Payment::class),
                 'pay' => abs($pay - $changed),
             ]);
@@ -167,7 +203,7 @@ class PaymentReport extends Component
             return $this->success('Berhasil!', 'Pembayaran telah dilakukan.');
         } catch (\Throwable $th) {
             DB::rollBack();
-            return $this->error('Oops!', 'Terjadi kesalahan.');
+            return $this->error('Oops!', $th->getMessage());
         }
     }
 

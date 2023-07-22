@@ -10,6 +10,8 @@ use Modules\Master\Datatables\StudentDatatable;
 use Modules\Master\Datatables\SchoolYearDatatable;
 use Modules\Master\Datatables\FirstMoveRoomDatatable;
 use Modules\Master\Datatables\SecondMoveRoomDatatable;
+use Modules\Dashboard\Datatables\NotifPembayaranDuDatatable;
+use Modules\Dashboard\Datatables\NotifPembayaranSppDatatable;
 
 class LivewireServiceProvider extends ServiceProvider
 {
@@ -27,5 +29,7 @@ class LivewireServiceProvider extends ServiceProvider
         Livewire::component('student-datatable', StudentDatatable::class);
         Livewire::component('first-move-room-datatable', FirstMoveRoomDatatable::class);
         Livewire::component('second-move-room-datatable', SecondMoveRoomDatatable::class);
+        Livewire::component('notif-spp-datatable', NotifPembayaranSppDatatable::class);
+        Livewire::component('notif-du-datatable', NotifPembayaranDuDatatable::class);
     }
 }

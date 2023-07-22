@@ -4,13 +4,15 @@ namespace Modules\Master\Entities;
 
 use Modules\Utils\Uuid;
 use Modules\Master\Entities\Room;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Modules\Payment\Entities\Payment;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Master\Constants\StudentConstant;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
-use Modules\Master\Constants\StudentConstant;
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Student extends Authenticatable
 {
@@ -102,5 +104,15 @@ class Student extends Authenticatable
     public function bill(): BelongsTo
     {
         return $this->belongsTo(Bill::class, 'bill_id')->withTrashed();
+    }
+
+    /**
+     * Get bill
+     *
+     * @return BelongsTo
+     */
+    public function payment(): HasMany
+    {
+        return $this->hasMany(Payment::class)->withTrashed();
     }
 }

@@ -15,7 +15,7 @@ use App\Datatables\Traits\HtmlComponents;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Payment\Http\Requests\SpendingRequest;
 
-class SpendingDatatable extends TableComponent
+class SpendingReportDatatable extends TableComponent
 {
     use HtmlComponents,
         Notify;
@@ -40,7 +40,7 @@ class SpendingDatatable extends TableComponent
     }
 
     /** @var string table component */
-    public $cardHeaderAction = 'payment::spending.component';
+    public $cardHeaderAction = 'payment::spending.componentReport';
 
     protected SpendingRequest $request;
 
@@ -137,9 +137,25 @@ class SpendingDatatable extends TableComponent
         return $this->error('', 'Password yang anda masukan salah.');
     }
 
+    public function searchQuery($search, $column, $query): Builder
+    {
+        if ($column['attribute'] === 'note_id') {
+            return $query->orWhereHas('note', function ($noteQuery) use ($search) {
+                $noteQuery->where('name', 'like', '%' . $search . '%');
+            });
+        } elseif ($column['attribute'] === 'bill_id') {
+            return $query->orWhereHas('bill', function ($billQuery) use ($search) {
+                $billQuery->where('name', 'like', '%' . $search . '%');
+            });
+        }
+
+        return parent::searchQuery($search, $column, $query);
+    }
+
     public function query(): Builder
     {
-        return Spending::query();
+        return Spending::query()
+            ->with(['note', 'bill']);
     }
 
     public function columns(): array
@@ -161,12 +177,6 @@ class SpendingDatatable extends TableComponent
                 ->format(function (Spending $model) {
                     return $model->bill->name;
                 }),
-            Column::make('nominal')
-                ->searchable()
-                ->sortable()
-                ->format(function (Spending $model) {
-                    return idr($model->nominal);
-                }),
             Column::make('keterangan', 'description')
                 ->searchable()
                 ->format(function (Spending $model) {
@@ -178,10 +188,17 @@ class SpendingDatatable extends TableComponent
                 ->format(function (Spending $model) {
                     return format_date($model->spending_date);
                 }),
-            Column::make('aksi')
+
+            Column::make('nominal')
+                ->searchable()
+                ->sortable()
                 ->format(function (Spending $model) {
-                    return view('payment::spending.action', ['model' => $model]);
-                })
+                    return idr($model->nominal);
+                }),
+            // Column::make('aksi')
+            //     ->format(function (Spending $model) {
+            //         return view('payment::spending.action', ['model' => $model]);
+            //     })
         ];
     }
 }

@@ -9,7 +9,7 @@
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group custom-select-icon" wire:ignore>
-                                            <select class="custom-select" id="search-student" wire:model='student.value'>
+                                            <select class="custom-select" id="search-student" wire:model='student' wire:change='search'>
                                                 <option></option>
                                                 @foreach ($students as $item)
                                                     <option value="{{ $item->id }}">
@@ -47,6 +47,18 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col col-lg-2">
+                                        <div class="form-group custom-select-icon" wire:ignore>
+                                            <select class="custom-select" id="search-month" wire:model='month' wire:change='search'>
+                                                <option></option>
+                                                @foreach ($months as $key => $item)
+                                                    <option value="{{ '0'.$key+1 }}">
+                                                        {{ $item }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-md-auto">
                                         <button wire:click.prevent='search' type="button" role="button"
                                             class="btn btn-primary" style="padding: 8px 30px;"
@@ -78,11 +90,38 @@
                                 <h4>Detail Laporan Pembayaran</h4>
                             </div>
 
-                            <x-payments.table-all-payment
+                            {{-- @foreach ($students as $item) --}}
+                                <x-payments.table-all-payment
+                                    :year="$year"
+                                    :bill="$bill"
+                                    :semester="$odd"
+                                    :month="$month"
+                                    :students="count($dataStudent)>0 ? $dataStudent : $students"
+                                    :payments="$payments"
+                                    title="Semester Ganjil"
+                                    :bill-result="$billResult"
+                                    type="ganjil"
+                                />
+
+                                <x-payments.table-all-payment
+                                    :year="$year"
+                                    :bill="$bill"
+                                    :semester="$even"
+                                    :month="$month"
+                                    :students="count($dataStudent)>0 ? $dataStudent : $students"
+                                    :payments="$payments"
+                                    title="Semester Genap"
+                                    :bill-result="$billResult"
+                                    type="genap"
+                                />
+                                
+                            {{-- @endforeach --}}
+
+                            {{-- <x-payments.table-all-payment
                                 :year="$year"
                                 :bill="$bill"
                                 :semester="$odd"
-                                :student="$student"
+                                :student="$student?->name"
                                 :payments="$payments"
                                 title="Semester Ganjil"
                                 :bill-result="$billResult"
@@ -93,12 +132,12 @@
                                 :year="$year"
                                 :bill="$bill"
                                 :semester="$even"
-                                :student="$student"
+                                :student="$student?->name"
                                 :payments="$payments"
                                 title="Semester Genap"
                                 :bill-result="$billResult"
                                 type="genap"
-                            />
+                            /> --}}
                         </div>
                     @endif
 
@@ -119,6 +158,12 @@
             <x-modals.modal id="pay" title="Pembayaran">
                 <form>
                     <x-slot name="body">
+                            <input
+                                hidden
+                                required
+                                name="studentPay"
+                                wire:model.defer='studentPay'
+                            >
                         <div class="form-group">
                             <x-inputs.text
                                 required
@@ -148,7 +193,7 @@
                     </x-slot>
                     <x-slot name="footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button wire:click.prevent="onPay" class="btn btn-primary"
+                        <button wire:click.prevent='onPay' class="btn btn-primary"
                             {{ $paymentState ? 'disabled' : '' }}>Bayar</button>
                     </x-slot>
                 </form>
@@ -201,6 +246,13 @@
                     placeholder: 'Pilih Tahun'
                 }, (e) => {
                     @this.set('year', e.target.value);
+                });
+
+                customSelect('#search-month', {
+                    allowClear: false,
+                    placeholder: 'Pilih Bulan'
+                }, (e) => {
+                    @this.set('month', e.target.value);
                 });
             });
 
