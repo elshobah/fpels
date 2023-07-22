@@ -27,6 +27,12 @@ class IncomeEloquent implements IncomeRepository
         return $this->income->query()->select('pay')->sum('pay');
     }
 
+    public function getIncome()
+    {
+        return $this->income->query()->orderBy('month','desc')->get();
+    }
+
+
     /**
      * Get total income where given bill
      *
@@ -158,7 +164,7 @@ class IncomeEloquent implements IncomeRepository
      * Callculate percentage
      *
      * @see https://kamus.tokopedia.com/p/persentase-pertumbuhan/
-     * 
+     *
      * @param integer|string $firstIncome
      * @param integer|string $lastIncome
      * @return integer

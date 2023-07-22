@@ -25,6 +25,11 @@ class SpendingEloquent implements SpendingRepository
         return $this->spending->all();
     }
 
+    public function getSpending()
+    {
+        return $this->spending->query()->get();
+    }
+
     /**
      * Get total spending
      *
