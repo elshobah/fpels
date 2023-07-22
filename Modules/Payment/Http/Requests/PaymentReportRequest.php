@@ -5,21 +5,21 @@ namespace Modules\Payment\Http\Requests;
 use Modules\Payment\Rules\PaySmaller;
 use Illuminate\Foundation\Http\FormRequest;
 
-class PaymentRequest extends FormRequest
+class PaymentReportRequest extends FormRequest
 {
-    /** @var string|null */
-    protected $bill;
-    protected $year;
-    protected $student;
-    protected $month;
+    // /** @var string|null */
+    // protected $bill;
+    // protected $year;
+    // protected $student;
+    // protected $month;
 
-    public function __construct(string $bill, string $year, string $student, ?string $month)
-    {
-        $this->bill = $bill;
-        $this->year = $year;
-        $this->student = $student;
-        $this->month = $month;
-    }
+    // public function __construct(string $bill, string $year, string $student, ?string $month)
+    // {
+    //     $this->bill = $bill;
+    //     $this->year = $year;
+    //     $this->student = $student;
+    //     $this->month = $month;
+    // }
 
     /**
      * Get the validation rules that apply to the request.
@@ -29,10 +29,10 @@ class PaymentRequest extends FormRequest
     public function rules()
     {
         return [
-            'pay' => ['required', new PaySmaller($this->bill, $this->year, $this->student, $this->month)],
+            'pay' => ['required'],
             'pay_date' => ['required'],
-            // 'updated_by' => ['nullable'],
-            // 'deleted_by' => ['nullable'],
+            'updated_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 
