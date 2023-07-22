@@ -90,9 +90,9 @@ class PaymentReportDatatable extends TableComponent
     }
 
     public ?array $filters = [
-        'pay_date' => '',
+        'bill_name' => '',
         'student_name' => '',
-        'pay' => '',
+        'month' => '',
     ];
 
     public function query(): Builder
@@ -100,8 +100,10 @@ class PaymentReportDatatable extends TableComponent
         $query = Payment::query();
 
         // Apply filters to the query based on the input values
-        if (!empty($this->filters['pay_date'])) {
-            $query->whereDate('pay_date', '=', $this->filters['pay_date']);
+        if (!empty($this->filters['bill_name'])) {
+            $query->whereHas('bill', function ($studentQuery) {
+                $studentQuery->where('name', 'like', '%' . $this->filters['bill_name'] . '%');
+            });
         }
 
         if (!empty($this->filters['student_name'])) {
