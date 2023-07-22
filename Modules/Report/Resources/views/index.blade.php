@@ -44,6 +44,21 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-6">
+                    <div class="card card-large-icons">
+                        <div class="card-icon bg-primary text-white">
+                            <i class="fad fa-dollar-sign"></i>
+                        </div>
+                        <div class="card-body">
+                            <h4>Pembayaran</h4>
+                            <p>Data Laporan Pembayaran.</p>
+                            <a href="{{ route('report.report2') }}" class="card-cta">
+                                Lihat
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
