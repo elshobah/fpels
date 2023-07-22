@@ -90,6 +90,7 @@ class PaymentReportDatatable extends TableComponent
     }
 
     public ?array $filters = [
+        'pay_date' => '',
         'bill_name' => '',
         'student_name' => '',
         'month' => '',
@@ -114,6 +115,10 @@ class PaymentReportDatatable extends TableComponent
 
         if (!empty($this->filters['month'])) {
             $query->where('month', 'like', '%' . $this->filters['month'] . '%');
+        }
+
+        if (!empty($this->filters['pay_date'])) {
+            $query->whereDate('pay_date', 'like', '%' . $this->filters['pay_date'] . '%');
         }
 
         return $query;
