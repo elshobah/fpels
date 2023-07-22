@@ -31,8 +31,8 @@ class PaymentRequest extends FormRequest
         return [
             'pay' => ['required', new PaySmaller($this->bill, $this->year, $this->student, $this->month)],
             'pay_date' => ['required'],
-            'updated_by' => ['nullable'],
-            'deleted_by' => ['nullable'],
+            // 'updated_by' => ['nullable'],
+            // 'deleted_by' => ['nullable'],
         ];
     }
 

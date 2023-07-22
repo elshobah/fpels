@@ -89,6 +89,33 @@ class PaymentReportDatatable extends TableComponent
         $this->$bill_id = null;
     }
 
+    public ?array $filters = [
+        'pay_date' => '',
+        'student_name' => '',
+        'pay' => '',
+    ];
+
+    public function query(): Builder
+    {
+        $query = Payment::query();
+
+        // Apply filters to the query based on the input values
+        if (!empty($this->filters['pay_date'])) {
+            $query->whereDate('pay_date', '=', $this->filters['pay_date']);
+        }
+
+        if (!empty($this->filters['student_name'])) {
+            $query->whereHas('student', function ($studentQuery) {
+                $studentQuery->where('name', 'like', '%' . $this->filters['student_name'] . '%');
+            });
+        }
+
+        if (!empty($this->filters['month'])) {
+            $query->where('month', 'like', '%' . $this->filters['month'] . '%');
+        }
+
+        return $query;
+    }
     // public function create()
     // {
     //     $this->resetValue();
@@ -172,11 +199,13 @@ class PaymentReportDatatable extends TableComponent
     //     return parent::searchQuery($search, $column, $query);
     // }
 
-    public function query(): Builder
-    {
-        return Payment::query();
-            // ->with(['note', 'bill']);
-    }
+
+    // tambahan
+    // public function query(): Builder
+    // {
+    //     return Payment::query();
+    //         // ->with(['note', 'bill']);
+    // }
 
     public function columns(): array
     {
@@ -197,16 +226,21 @@ class PaymentReportDatatable extends TableComponent
                 ->format(function (Payment $model) {
                     return $model->student->name;
                 }),
-            Column::make('Pembayaran', 'pay')
+            Column::make('Tagihan', 'bill_id')
                 ->searchable()
-                ->sortable()
                 ->format(function (Payment $model) {
-                    return idr($model->pay);
+                    return $model->bill->name;
                 }),
             Column::make('Untuk Bulan', 'month')
                 ->searchable()
                 ->format(function (Payment $model) {
                     return $model->month;
+                }),
+            Column::make('Pembayaran', 'pay')
+                ->searchable()
+                ->sortable()
+                ->format(function (Payment $model) {
+                    return idr($model->pay);
                 }),
             // Column::make('tanggal', 'spending_date')
             //     ->sortable()
