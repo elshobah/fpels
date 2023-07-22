@@ -15,7 +15,7 @@ use Modules\Payment\Entities\Note;
 use App\Datatables\Traits\HtmlComponents;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Payment\Http\Requests\SpendingRequest;
-use Modules\Payment\Http\Requests\PaymentRequest;
+use Modules\Payment\Http\Requests\PaymentReportRequest;
 
 class PaymentReportDatatable extends TableComponent
 {
@@ -26,6 +26,10 @@ class PaymentReportDatatable extends TableComponent
     public ?array $bills;
     public ?array $notes;
     public ?array $payments;
+    public ?array $year;
+    public ?array $students;
+    public ?array $months;
+
 
     /** @var null|string */
     public $pid = null;
@@ -52,16 +56,16 @@ class PaymentReportDatatable extends TableComponent
     /** @var string table component */
     public $cardHeaderAction = 'payment::payment.componentReport';
 
-    protected PaymentRequest $requestPayment;
-    // protected SpendingRequest $request;
+    // protected PaymentReportRequest $requestPayment;
+    // // protected SpendingRequest $request;
 
-    public function __construct(string $id = null)
-    {
-        parent::__construct($id);
-        $this->request = new PaymentRequest;
-        // $this->request = new SpendingRequest;
+    // public function __construct(string $id = null)
+    // {
+    //     parent::__construct($id);
+    //     $this->request = new PaymentReportRequest;
+    //     // $this->request = new SpendingRequest;
 
-    }
+    // }
 
     public function mount()
     {
@@ -181,35 +185,35 @@ class PaymentReportDatatable extends TableComponent
             // Column::make('nama', 'name')
             //     ->searchable()
             //     ->sortable(),
-            Column::make('Tgl Pembayran', 'pay_id')
+            Column::make('Tgl Pembayaran', 'pay_date')
                 ->searchable()
                 ->sortable()
                 ->format(function (Payment $model) {
-                    return $model->pay_id;
+                    return format_date($model->pay_date);
                 }),
             Column::make('Nama', 'student_id')
                 ->searchable()
                 ->sortable()
-                ->format(function (Spending $model) {
+                ->format(function (Payment $model) {
                     return $model->student->name;
                 }),
-            Column::make('nominal')
+            Column::make('Pembayaran', 'pay')
                 ->searchable()
                 ->sortable()
-                ->format(function (Spending $model) {
-                    return idr($model->nominal);
+                ->format(function (Payment $model) {
+                    return idr($model->pay);
                 }),
-            Column::make('keterangan', 'description')
+            Column::make('Untuk Bulan', 'month')
                 ->searchable()
-                ->format(function (Spending $model) {
-                    return $model->description === '' || is_null($model->description) ? '-' : $this->html($model->description);
+                ->format(function (Payment $model) {
+                    return $model->month;
                 }),
-            Column::make('tanggal', 'spending_date')
-                ->sortable()
-                ->searchable()
-                ->format(function (Spending $model) {
-                    return format_date($model->spending_date);
-                }),
+            // Column::make('tanggal', 'spending_date')
+            //     ->sortable()
+            //     ->searchable()
+            //     ->format(function (Spending $model) {
+            //         return format_date($model->spending_date);
+            //     }),
             // Column::make('aksi')
             //     ->format(function (Spending $model) {
             //         return view('payment::spending.action', ['model' => $model]);
