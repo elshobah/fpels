@@ -122,5 +122,5 @@
             </div>
         </div>
     </section>
-    <livewire:spending-datatable :title="$title" :bills="$bills" :notes="$notes" />
+    <livewire:spending-report-datatable :title="$title" :bills="$bills" :notes="$notes" />
 </x-app-layout>
