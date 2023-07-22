@@ -29,12 +29,16 @@
                     // }
                     $totalForStatus = [];
                     $studentId = '';
+                    $payed = 0;
                     // dd($payments[$i]);
                     if ($any) {
                         foreach ($payments[$i] as $key => $value) {
                             $studentId = $value['student_id'];
                             // ($value['student_id'] == $student->id) ? $status = true : $status = false;
-                            $totalForStatus[] = $value['pay'];
+                            $status['value'] = $value['pay'];
+                            $status['student_id'] = $value['student_id'];
+                            array_push($totalForStatus, $status);
+                            // $totalForStatus[] = $status;
                         }
                     }
                 @endphp
@@ -52,21 +56,22 @@
                         <td>{{ $billResult->name }}</td>
                         <td>{{ idr($billResult->nominal) }}</td>
                         <td>
-                            @if ($studentId == $student->id)
-                                @if (array_sum($totalForStatus) === $billResult['nominal'])
-                                    <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
-                                @else
-                                    <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
-                                @endif
-                            @else
+                            @php
+                                // get only student id from array
+                                $studentId = array_column($totalForStatus, 'student_id');
+                            @endphp
+                            @if (!in_array($student->id, $studentId))
                                 <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
+                            @else
+                                @foreach ($totalForStatus as $status)
+                                    {{-- @dd($totalForStatus) --}}
+                                    @if (($status['value'] == $billResult['nominal'])&&($status['student_id'] == $student->id))
+                                        <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
+                                    @else
+                                        @continue
+                                    @endif
+                                @endforeach
                             @endif
-
-                            {{-- @if (array_sum($totalForStatus) === $billResult['nominal'])
-                                <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
-                            @else
-                                <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
-                            @endif --}}
                         </td>
                         {{-- <td>
                             <button class="btn btn-info btn-sm" role="button" data-toggle="collapse"
@@ -97,14 +102,21 @@
                         <td>{{ $billResult->name }}</td>
                         <td>{{ idr($billResult->nominal) }}</td>
                         <td>
-                            @if ($studentId == $student->id)
-                                @if (array_sum($totalForStatus) === $billResult['nominal'])
-                                    <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
-                                @else
-                                    <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
-                                @endif
-                            @else
+                            @php
+                                // get only student id from array
+                                $studentId = array_column($totalForStatus, 'student_id');
+                            @endphp
+                            @if (!in_array($student->id, $studentId))
                                 <span class="badge badge-danger" style="font-size: 11px; padding: 3px 8px">Tunggak</span>
+                            @else
+                                @foreach ($totalForStatus as $status)
+                                    {{-- @dd($totalForStatus) --}}
+                                    @if (($status['value'] == $billResult['nominal'])&&($status['student_id'] == $student->id))
+                                        <span class="badge badge-success" style="font-size: 11px; padding: 3px 8px">Lunas</span>
+                                    @else
+                                        @continue
+                                    @endif
+                                @endforeach
                             @endif
                         </td>
                         {{-- <td>
