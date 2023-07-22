@@ -40,7 +40,7 @@ class SpendingReportDatatable extends TableComponent
     }
 
     /** @var string table component */
-    public $cardHeaderAction = 'payment::spending.component2';
+    public $cardHeaderAction = 'payment::spending.componentReport';
 
     protected SpendingRequest $request;
 
@@ -177,12 +177,6 @@ class SpendingReportDatatable extends TableComponent
                 ->format(function (Spending $model) {
                     return $model->bill->name;
                 }),
-            Column::make('nominal')
-                ->searchable()
-                ->sortable()
-                ->format(function (Spending $model) {
-                    return idr($model->nominal);
-                }),
             Column::make('keterangan', 'description')
                 ->searchable()
                 ->format(function (Spending $model) {
@@ -193,6 +187,13 @@ class SpendingReportDatatable extends TableComponent
                 ->searchable()
                 ->format(function (Spending $model) {
                     return format_date($model->spending_date);
+                }),
+
+            Column::make('nominal')
+                ->searchable()
+                ->sortable()
+                ->format(function (Spending $model) {
+                    return idr($model->nominal);
                 }),
             // Column::make('aksi')
             //     ->format(function (Spending $model) {

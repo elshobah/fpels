@@ -1,4 +1,8 @@
 <div>
+    <div>
+        <h3>Tabel Pemasukan</h3>
+
+    </div>
     {{-- <button type="button" wire:click.prevent="create" class="btn btn-primary">
         <i class="fas fa-plus-circle"></i> Tambah
     </button> --}}
