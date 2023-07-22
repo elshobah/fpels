@@ -69,94 +69,137 @@ class SpendingReportDatatable extends TableComponent
         $this->description = null;
     }
 
-    public function create()
-    {
-        $this->resetValue();
-        return $this->emit('modal:toggle');
-    }
-
-    public function save(): Event
-    {
-        $validated = $this->validate($this->request->rules($this->bill_id), [], $this->request->attributes());
-        $result = array_merge($validated, ['nominal' => clean_currency_format($validated['nominal'])]);
-
-        if ($this->query()->create($result)) {
-            $this->resetValue();
-            return $this->success('Berhasil!', 'Pengeluaran berhasil ditambahkan.');
-        }
-
-        return $this->error('Oopss!', 'Terjadi kesalahan saat menambah pengeluaran.');
-    }
-
-    public function edit(string $id): Event
-    {
-        $this->pid = $id;
-        $query = $this->query()->whereId($id)->first();
-
-        if (!$query) {
-            return $this->error('Oopss!', 'Pengeluaran tidak ditemukan.');
-        }
-
-        $this->note_id = $query->note_id;
-        $this->nominal = $query->nominal;
-        $this->bill_id = $query->bill_id;
-        $this->spending_date = \Carbon\Carbon::parse($query->spending_date)->format('Y-m-d');
-        $this->description = $query->description;
-
-        return $this->emit('modal:toggle', $query->description);
-    }
-
-    public function update(): Event
-    {
-        $spending = $this->query()->whereId($this->pid)->first();
-
-        if (!$spending) {
-            return $this->error('Oopss!', 'Pengeluaran tidak ditemukan.');
-        }
-
-        $validated = $this->validate($this->request->rules($this->bill_id, $isUpdate = true), [], $this->request->attributes());
-        $result = array_merge($validated, ['nominal' => clean_currency_format($validated['nominal'])]);
-
-        if ($spending->update($result)) {
-            return $this->success('Berhasil!', 'Pengeluaran berhasil diubah.');
-        }
-
-        return $this->error('Oopss!', 'Terjadi kesalahan saat mengubah pengeluaran.');
-    }
-
-    public function delete(string $id, string $password)
-    {
-        if (Hash::check($password, Auth::user()->password)) {
-            if ($this->query()->whereId($id)->delete()) {
-                return $this->success('Berhasil!', 'Pengeluaran berhasil dihapus.');
-            }
-
-            return $this->error('Oopss!', 'Terjadi kesalahan saat menghapus pengeluaran.');
-        }
-
-        return $this->error('', 'Password yang anda masukan salah.');
-    }
-
-    public function searchQuery($search, $column, $query): Builder
-    {
-        if ($column['attribute'] === 'note_id') {
-            return $query->orWhereHas('note', function ($noteQuery) use ($search) {
-                $noteQuery->where('name', 'like', '%' . $search . '%');
-            });
-        } elseif ($column['attribute'] === 'bill_id') {
-            return $query->orWhereHas('bill', function ($billQuery) use ($search) {
-                $billQuery->where('name', 'like', '%' . $search . '%');
-            });
-        }
-
-        return parent::searchQuery($search, $column, $query);
-    }
+    public ?array $filters = [
+        'note_name' => '',
+        'bill_name' => '',
+        'description' => '',
+        'spending_date' => '',
+    ];
 
     public function query(): Builder
     {
-        return Spending::query()
-            ->with(['note', 'bill']);
+        $query = Spending::query();
+
+        // Apply filters to the query based on the input values
+        if (!empty($this->filters['bill_name'])) {
+            $query->whereHas('bill', function ($spendingQuery) {
+                $spendingQuery->where('name', 'like', '%' . $this->filters['bill_name'] . '%');
+            });
+        }
+
+        if (!empty($this->filters['note_name'])) {
+            $query->whereHas('note', function ($spendingQuery) {
+                $spendingQuery->where('name', 'like', '%' . $this->filters['note_name'] . '%');
+            });
+        }
+
+        if (!empty($this->filters['spending_date'])) {
+            $query->whereDate('spending_date', 'like', '%' . $this->filters['spending_date'] . '%');
+        }
+
+        // if (!empty($this->filters['student_name'])) {
+        //     $query->whereHas('student', function ($studentQuery) {
+        //         $studentQuery->where('name', 'like', '%' . $this->filters['student_name'] . '%');
+        //     });
+        // }
+
+        // if (!empty($this->filters['month'])) {
+        //     $query->where('month', 'like', '%' . $this->filters['month'] . '%');
+        // }
+
+
+
+        return $query;
     }
+
+    // public function create()
+    // {
+    //     $this->resetValue();
+    //     return $this->emit('modal:toggle');
+    // }
+
+    // public function save(): Event
+    // {
+    //     $validated = $this->validate($this->request->rules($this->bill_id), [], $this->request->attributes());
+    //     $result = array_merge($validated, ['nominal' => clean_currency_format($validated['nominal'])]);
+
+    //     if ($this->query()->create($result)) {
+    //         $this->resetValue();
+    //         return $this->success('Berhasil!', 'Pengeluaran berhasil ditambahkan.');
+    //     }
+
+    //     return $this->error('Oopss!', 'Terjadi kesalahan saat menambah pengeluaran.');
+    // }
+
+    // public function edit(string $id): Event
+    // {
+    //     $this->pid = $id;
+    //     $query = $this->query()->whereId($id)->first();
+
+    //     if (!$query) {
+    //         return $this->error('Oopss!', 'Pengeluaran tidak ditemukan.');
+    //     }
+
+    //     $this->note_id = $query->note_id;
+    //     $this->nominal = $query->nominal;
+    //     $this->bill_id = $query->bill_id;
+    //     $this->spending_date = \Carbon\Carbon::parse($query->spending_date)->format('Y-m-d');
+    //     $this->description = $query->description;
+
+    //     return $this->emit('modal:toggle', $query->description);
+    // }
+
+    // public function update(): Event
+    // {
+    //     $spending = $this->query()->whereId($this->pid)->first();
+
+    //     if (!$spending) {
+    //         return $this->error('Oopss!', 'Pengeluaran tidak ditemukan.');
+    //     }
+
+    //     $validated = $this->validate($this->request->rules($this->bill_id, $isUpdate = true), [], $this->request->attributes());
+    //     $result = array_merge($validated, ['nominal' => clean_currency_format($validated['nominal'])]);
+
+    //     if ($spending->update($result)) {
+    //         return $this->success('Berhasil!', 'Pengeluaran berhasil diubah.');
+    //     }
+
+    //     return $this->error('Oopss!', 'Terjadi kesalahan saat mengubah pengeluaran.');
+    // }
+
+    // public function delete(string $id, string $password)
+    // {
+    //     if (Hash::check($password, Auth::user()->password)) {
+    //         if ($this->query()->whereId($id)->delete()) {
+    //             return $this->success('Berhasil!', 'Pengeluaran berhasil dihapus.');
+    //         }
+
+    //         return $this->error('Oopss!', 'Terjadi kesalahan saat menghapus pengeluaran.');
+    //     }
+
+    //     return $this->error('', 'Password yang anda masukan salah.');
+    // }
+
+    // public function searchQuery($search, $column, $query): Builder
+    // {
+    //     if ($column['attribute'] === 'note_id') {
+    //         return $query->orWhereHas('note', function ($noteQuery) use ($search) {
+    //             $noteQuery->where('name', 'like', '%' . $search . '%');
+    //         });
+    //     } elseif ($column['attribute'] === 'bill_id') {
+    //         return $query->orWhereHas('bill', function ($billQuery) use ($search) {
+    //             $billQuery->where('name', 'like', '%' . $search . '%');
+    //         });
+    //     }
+
+    //     return parent::searchQuery($search, $column, $query);
+    // }
+
+    // public function query(): Builder
+    // {
+    //     return Spending::query()
+    //         ->with(['note', 'bill']);
+    // }
 
     public function columns(): array
     {

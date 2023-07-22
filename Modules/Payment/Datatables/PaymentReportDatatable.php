@@ -235,6 +235,7 @@ class PaymentReportDatatable extends TableComponent
                 }),
             Column::make('Tagihan', 'bill_id')
                 ->searchable()
+                ->sortable()
                 ->format(function (Payment $model) {
                     return $model->bill->name;
                 }),
