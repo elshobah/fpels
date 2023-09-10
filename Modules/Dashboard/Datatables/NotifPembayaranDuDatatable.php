@@ -181,7 +181,7 @@ class NotifPembayaranDuDatatable extends TableComponent
             //     ->format(function (Student $model) {
             //         return $model->bill;
             //     }),
-            Column::make('tanggal', 'spending_date')
+            Column::make('per tanggal', 'spending_date')
                 ->sortable()
                 ->searchable()
                 ->format(function (Student $model) {

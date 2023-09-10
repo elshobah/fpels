@@ -65,9 +65,11 @@
 
         <div class="row">
             <div class="col-6">
+                <p>Data Pembayaran SPP</p>
                 <livewire:notif-spp-datatable />
             </div>
             <div class="col-6">
+                <p>Data Pembayaran Daftar Ulang</p>
                 <livewire:notif-du-datatable />
             </div>
         </div>
